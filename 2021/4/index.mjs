@@ -36,11 +36,11 @@ const markBoard = (board, callout) => {
     })
 }
 
-const checkWinner = (board, callout) => {
+const checkWinner = (board, callout, bIndex) => {
     // Check horizontal
     const wonHorizontal = board.findIndex(i => i.filter(j => j.marked === true).length === BOARD_DIMENSIONS) !== -1;
     if (wonHorizontal) { 
-        alertWinner(board, callout);
+        alertWinner(board, callout, bIndex);
         return true;
     }
 
@@ -48,7 +48,7 @@ const checkWinner = (board, callout) => {
     for (let i = 0; i < BOARD_DIMENSIONS; i++) {
         const wonVertical = board.filter(j => j[i].marked === true).length === BOARD_DIMENSIONS;
         if (wonVertical) { 
-            alertWinner(board, callout); 
+            alertWinner(board, callout, bIndex); 
             return true;
         }
     }
@@ -67,13 +67,16 @@ const checkWinner = (board, callout) => {
     return false;
 }
 
-const alertWinner = (board, callout) => {
-    console.log('WINNER WINNER', callout, board)
+const winners = [];
+const alertWinner = (board, callout, bIndex) => {
+    if (winners.indexOf(bIndex) !== -1) { return }
+    // console.log('WINNER WINNER', callout, board)
     let score = 0;
     // Sum up unmarked places
     board.flatMap(i => i.filter(j => !j.marked)).forEach(i => score += i.num);
     // Multiply by the winning callout
-    console.log('SCORE', score * callout);
+    console.log('WINNER WINNER', bIndex, score * callout);
+    winners.push(bIndex);
 }
 
 const CALLOUTS = input[0].split(',').map(i => parseInt(i));
@@ -82,12 +85,12 @@ const NUM_BOARDS = getNumBoards();
 const BOARDS = initBoards();
 
 // Play the game.
-const WINNER = CALLOUTS.find((callout, cIndex) => {
-    return BOARDS.find((board, bIndex) => {
+const WINNER = CALLOUTS.forEach((callout, cIndex) => {
+    return BOARDS.forEach((board, bIndex) => {
         // Marks the board
         markBoard(board, callout);
         // Check for winner
-        return checkWinner(board, callout)
+        return checkWinner(board, callout, bIndex);
     });
 })
 
