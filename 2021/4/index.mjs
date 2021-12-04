@@ -54,15 +54,15 @@ const checkWinner = (board, callout) => {
     }
 
     // Check diagonal
-    const marked = [];
-    for (let i = 0; i < BOARD_DIMENSIONS; i++) {
-        marked.push(board[i][i].marked === true);
-    }
-    const wonDiagonal = marked.filter(i => i).length === BOARD_DIMENSIONS;
-    if (wonDiagonal) { 
-        alertWinner(board, callout); 
-        return true;
-    }    
+    // const marked = [];
+    // for (let i = 0; i < BOARD_DIMENSIONS; i++) {
+    //     marked.push(board[i][i].marked === true);
+    // }
+    // const wonDiagonal = marked.filter(i => i).length === BOARD_DIMENSIONS;
+    // if (wonDiagonal) { 
+    //     alertWinner(board, callout); 
+    //     return true;
+    // }    
 
     return false;
 }
