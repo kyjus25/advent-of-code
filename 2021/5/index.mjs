@@ -12,7 +12,7 @@ const input  = inputFile
                 });
 
 const MAP = [];
-const MAP_DIMENSIONS = 9;
+const MAP_DIMENSIONS = 1000;
 
 const createMap = () => {
     for (let x = 0; x <= MAP_DIMENSIONS; x++) {
@@ -36,12 +36,35 @@ const plot = (coords) => {
         method = 'HORIZONTAL';
         pivot = coords.y1;
         if (coords.x1 < coords.x2) { start = coords.x1; end = coords.x2; } else { start = coords.x2; end = coords.x1; }
-    } else if ((coords.x1 - coords.x2) === (coords.y1 - coords.y2)) {
+    } else if (
+        (coords.x1 - coords.x2) === (coords.y1 - coords.y2) || 
+        (coords.x1 - coords.x2) === (coords.y2 - coords.y1) ) {
         // Could be diagonal
-        console.log('DIAGONAL', coords);
+        method = 'DIAGONAL';
+        plotDiagonal(coords);
     }
-    if (method === 'NONE') { return; }
+    if (method === 'NONE') { 
+        console.log('NONE', coords);
+        // addPoint(coords.x1, coords.y1);
+        // addPoint(coords.x2, coords.y2);
+        return;
+    }
     addPoints(method, pivot, start, end);
+}
+
+const plotDiagonal = (coords) => {
+    let iterateX = 1;
+    let iterateY = 1;
+    let currX = coords.x1;
+    let currY = coords.y1;
+    if (coords.x1 > coords.x2) {  iterateX = -1; }
+    if (coords.y1 > coords.y2) {  iterateY = -1; }  
+    addPoint(currX, currY);
+    while (currX !== coords.x2 && currY !== coords.y2) {
+        currX = currX + iterateX;
+        currY = currY + iterateY;
+        addPoint(currX, currY);
+    }
 }
 
 const addPoints = (method, pivot, start, end) => {
@@ -78,7 +101,7 @@ createMap();
 input.forEach(coords => {
     plot(coords);
 });
-findAnswer();
 log();
+findAnswer();
 
 // console.log('input', input);
