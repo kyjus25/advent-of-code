@@ -3,32 +3,17 @@ import fs from 'fs';
 const inputFile = fs.readFileSync('input.txt', 'utf8');
 let input  = inputFile.split(',').map(i => parseInt(i));
 
-const resolve = () => {
-    let push = 0;
-    input = input.map(i => {
-        if (i === 0) { 
-            i = 7; // 6 plus 1 to account for them all to go down a num
-            push++;
-        }
-        return i;
-    });
-
-    input = input.map(i => i - 1);
-
-    [...Array(push).keys()].forEach(i => {
-        input.push(8);
-    });
+const queue = Array(9).fill(0);
+input.forEach(i => queue[i]++);
+console.log('INITIAL state', JSON.stringify(queue) );
+for (let i = 0; i < 256; i++) {
+    const spawn = queue.shift();
+    queue[6] += spawn;
+    queue.push(spawn);
+    console.log(`After ${i + 1} days`, JSON.stringify(queue) );
 }
 
-const iterate = (days) => {
-    console.log('Intial State: ', JSON.stringify(input));
-    [...Array(days).keys()].forEach(i => {
-        resolve();
-        // console.log(`After ${i + 1} days: `, JSON.stringify(input));
-    });
-    console.log('TOTAL: ', input.length);
-}
-
-iterate(256);
+const total = queue.reduce((a,b) => a + b);
+console.log('TOTAL', total);
 
 // console.log('input', input);
