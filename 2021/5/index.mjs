@@ -36,6 +36,9 @@ const plot = (coords) => {
         method = 'HORIZONTAL';
         pivot = coords.y1;
         if (coords.x1 < coords.x2) { start = coords.x1; end = coords.x2; } else { start = coords.x2; end = coords.x1; }
+    } else if ((coords.x1 - coords.x2) === (coords.y1 - coords.y2)) {
+        // Could be diagonal
+        console.log('DIAGONAL', coords);
     }
     if (method === 'NONE') { return; }
     addPoints(method, pivot, start, end);
@@ -62,6 +65,10 @@ const addPoint = (x,y) => {
     MAP[y][x] = MAP[y][x] + 1;
 }
 
+const findAnswer = () => {
+    console.log('ANSWER', MAP.flatMap(i => i.filter(j => j >= 2)).length);
+}
+
 const log = () => {
     const display = MAP.map(i => i.join(' '));
     console.log(display);
@@ -71,6 +78,7 @@ createMap();
 input.forEach(coords => {
     plot(coords);
 });
+findAnswer();
 log();
 
 // console.log('input', input);
