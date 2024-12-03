@@ -1,4 +1,4 @@
-const file = await Bun.file("1.txt").text();
+const file = await Bun.file("input.txt").text();
 // Split the file by rows
 const rows = file.split("\n").map((i) => i.split("   "));
 
