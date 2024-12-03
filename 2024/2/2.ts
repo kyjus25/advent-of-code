@@ -32,10 +32,17 @@ const getLevels = (row: number[]) => {
 };
 
 const checks: boolean[] = rows.reduce((acc, curr) => {
-  const levels = getLevels(curr);
-
-  console.log(levels);
-  acc.push(levels);
+  const levels: boolean[] = [
+    // Check safety with all levels
+    getLevels(curr),
+    // Also check safety if any 1 level is removed
+    ...[...Array(curr.length).keys()].map((i) => {
+      const arr: number[] = curr.filter((_, index) => index !== i);
+      return getLevels(arr);
+    }),
+  ];
+  // Return if any level check was safe
+  acc.push(levels.find((i) => i === true) || false);
   return acc;
 }, [] as boolean[]);
 
