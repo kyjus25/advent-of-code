@@ -1,5 +1,9 @@
 const file = await Bun.file("input.txt").text();
-const grid = file.split("\n").map((i) => i.split(""));
+// Split the input file into a grid of characters
+const grid = file
+  .split("\n")
+  .filter((row) => row.trim() !== "")
+  .map((i) => i.split(""));
 
 interface Answer {
   word: string;
@@ -8,97 +12,95 @@ interface Answer {
     | "right"
     | "up"
     | "down"
-    | "diagonalRight"
-    | "diagonalLeft"
+    | "diagonalDownRight"
+    | "diagonalDownLeft"
+    | "diagonalUpRight"
+    | "diagonalUpLeft"
     | "unknown";
-  startX: number;
-  startY: number;
+  startX: number; // Starting X coordinate
+  startY: number; // Starting Y coordinate
 }
 
+// List of words to search for
 const words: string[] = ["XMAS"];
 let answers: Answer[] = [];
 
+// Function to determine the direction based on dirX and dirY
 const getDirection = (dirX: number, dirY: number) => {
-  if (dirX === 0 && dirY === 1) return "right";
-  if (dirX === 0 && dirY === -1) return "left";
-  if (dirX === 1 && dirY === 0) return "down";
-  if (dirX === -1 && dirY === 0) return "up";
-  if (dirX === 1 && dirY === 1) return "diagonalDownRight"; //
-  if (dirX === 1 && dirY === -1) return "diagonalDownRight";
-  if (dirX === -1 && dirY === 1) return "diagonalUpLeft";
-  if (dirX === -1 && dirY === -1) return "diagonalDownLeft";
-  return "unknown";
+  if (dirX === 0 && dirY === 1) return "right"; // Moving right
+  if (dirX === 0 && dirY === -1) return "left"; // Moving left
+  if (dirX === 1 && dirY === 0) return "down"; // Moving down
+  if (dirX === -1 && dirY === 0) return "up"; // Moving up
+  if (dirX === 1 && dirY === 1) return "diagonalDownRight"; // Moving diagonally down-right
+  if (dirX === 1 && dirY === -1) return "diagonalDownLeft"; // Moving diagonally down-left
+  if (dirX === -1 && dirY === 1) return "diagonalUpRight"; // Moving diagonally up-right
+  if (dirX === -1 && dirY === -1) return "diagonalUpLeft"; // Moving diagonally up-left
+  return "unknown"; // Unknown direction
 };
 
+// Function to check for a word in a given direction
 const check = (
   word: string,
-  currX: number,
-  currY: number,
-  dirX: number,
-  dirY: number
+  currX: number, // Current X position
+  currY: number, // Current Y position
+  dirX: number, // Direction along the X axis
+  dirY: number // Direction along the Y axis
 ) => {
-  let index = 0;
-  for (
-    let x = currX;
-    dirX === 0 ? (x = x) : Math.abs(dirX) === dirX ? x < grid.length : x >= 0;
-    dirX === 0 ? (x += 0) : Math.abs(dirX) === dirX ? x++ : x--
-  ) {
-    // console.log("x is now", x, dirX, currX);
-    for (
-      let y = currY;
-      dirY === 0
-        ? (y = y)
-        : Math.abs(dirY) === dirY
-        ? y < grid[x].length
-        : y >= 0;
-      dirY === 0 ? (y += 0) : Math.abs(dirY) === dirY ? y++ : y--
-    ) {
-      console.log("y is now", y, dirY, currY);
-      const letter = grid[x][y];
-      const expectedLetter: string = word.charAt(index);
-      console.log("letter", letter, expectedLetter, x, y);
-      if (letter !== expectedLetter) return;
-      if (index === word.length - 1) {
-        answers.push({
-          word: word,
-          direction: getDirection(dirX, dirY) as any,
-          startX: currX,
-          startY: currY,
-        });
-        return;
-      }
-      index++;
+  // Loop through each character in the word
+  for (let i = 0; i < word.length; i++) {
+    // Calculate the new position
+    const newX = currX + i * dirX;
+    const newY = currY + i * dirY;
+
+    // Ensure the position is within bounds
+    if (
+      newX < 0 ||
+      newX >= grid.length ||
+      newY < 0 ||
+      newY >= grid[newX].length
+    )
+      return;
+
+    // Check if the character matches
+    if (grid[newX][newY] !== word.charAt(i)) return;
+
+    // If we reach the last character, add the word to answers
+    if (i === word.length - 1) {
+      answers.push({
+        word: word,
+        direction: getDirection(dirX, dirY), // Determine direction
+        startX: currX, // Starting X coordinate
+        startY: currY, // Starting Y coordinate
+      });
     }
   }
 };
 
-// Loop thru all rows
+// Loop through all rows in the grid
 for (let x = 0; x < grid.length; x++) {
-  // Loop thru all columns
+  // Loop through all columns in the grid
   for (let y = 0; y < grid[x].length; y++) {
-    // Check each word in our wordlist
+    // Check each word in the word list
     words.forEach((word) => {
-      // If we found a letter than matches one of the words
-      if (x !== 0 || y !== 5) return;
+      // If the first letter of the word matches the current cell
       if (word.charAt(0) === grid[x][y]) {
         console.log("Found", word.charAt(0), "at", x, y, "Checking word", word);
-        // check(word, x, y, 0, 1);
-        // check(word, x, y, 0, -1);
-        // check(word, x, y, 1, 0);
-        // check(word, x, y, -1, 0);
-        // check(word, x, y, 1, 1);
-        // check(word, x, y, 1, -1);
-        // check(word, x, y, -1, 1);
-        // check(word, x, y, -1, -1);
-        // check(word, x, y, -1, 0);
-        check(word, x, y, 1, 1);
+
+        // Check in all possible directions
+        check(word, x, y, 0, 1); // Right
+        check(word, x, y, 0, -1); // Left
+        check(word, x, y, 1, 0); // Down
+        check(word, x, y, -1, 0); // Up
+        check(word, x, y, 1, 1); // Diagonal down-right
+        check(word, x, y, 1, -1); // Diagonal down-left
+        check(word, x, y, -1, 1); // Diagonal up-right
+        check(word, x, y, -1, -1); // Diagonal up-left
       }
     });
-    // console.log("GRID", val);
   }
 }
 
-console.log(grid);
-
-console.log(answers);
-console.log(answers.length);
+// Log the final results
+console.log(grid); // Display the grid
+console.log(answers); // Display the found words and their details
+console.log(answers.length); // Display the total number of found words
